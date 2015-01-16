@@ -16,7 +16,6 @@ package pe.sbk.alwaysontop;
  * limitations under the License.
  */
 
-import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -32,10 +31,7 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.TextView;
 
 /**
  * 
@@ -86,7 +82,7 @@ public class CircleLayout extends ViewGroup {
 	// The runnable of the current rotation
 	private FlingRunnable actRunnable = null;
 
-	private WindowManager mWindowManager = (WindowManager) getContext().getSystemService("window");
+	private WindowManager mWindowManager;
 	//private View mImageView = inflater.inflate(R.layout.quick_button, null);
 	/**
 	 * @param context
@@ -121,7 +117,9 @@ public class CircleLayout extends ViewGroup {
 	 *            the attributes used to modify default settings
 	 */
 	protected void init(AttributeSet attrs) {
-		mGestureDetector = new GestureDetector(getContext(),
+
+
+        mGestureDetector = new GestureDetector(getContext(),
 				new MyGestureListener());
 		quadrantTouched = new boolean[] { false, false, false, false, false };
 
@@ -521,6 +519,9 @@ public class CircleLayout extends ViewGroup {
 				}*/
 				return true;
 			}
+//            else{
+//                Toast.makeText(getApplicationContext(),"xp",Toast.LENGTH_SHORT).show();
+//            }
 			return super.onSingleTapUp(e);
 		}
 	}
@@ -571,6 +572,8 @@ public class CircleLayout extends ViewGroup {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NO_HISTORY);
         }
 
+
+
             //WindowManager mWindowManager = (WindowManager) getSystemService("window");
             //final View circleMenu = inflater.inflate(R.layout.circle_menu, null);
             //ViewParent parent = ((ViewGroup)view.getParent()).getParent();
@@ -583,6 +586,9 @@ public class CircleLayout extends ViewGroup {
             } catch (ActivityNotFoundException ex) {
                 return;
             }
+
+        Intent serviceIntent = new Intent("pe.sbk.HideCircleMenu");
+        getContext().startService(serviceIntent);
 
     }
 

@@ -39,6 +39,7 @@
             android:exported="false" > <!-- 퍼미션 중요 -->
             <intent-filter>
                 <action android:name="pe.sbk.OnTop" />
+                <action android:name="pe.sbk.HideCircleMenu" />
             </intent-filter>
             <!--android:process=":remote"-->
         </service>

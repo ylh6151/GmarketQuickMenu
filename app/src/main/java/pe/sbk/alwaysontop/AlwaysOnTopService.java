@@ -27,6 +27,7 @@ import java.util.List;
 public class AlwaysOnTopService extends Service {
 	//private TextView mPopupView;							//항상 보이게 할 뷰
 	private View mImageView;
+    private View mCircleView;
 	private WindowManager.LayoutParams mParams;		//layout params 객체. 뷰의 위치 및 크기를 지정하는 객체
 	private WindowManager mWindowManager;			//윈도우 매니저
 	private SeekBar mSeekBar;								//투명도 조절 seek bar
@@ -35,7 +36,7 @@ public class AlwaysOnTopService extends Service {
 	private final IBinder mBinder = new LocalBinder();
 	ArrayList<String> quickmenu;
 	List quickmenulist;
-	
+
 	private float START_X, START_Y;							//움직이기 위해 터치한 시작 점
 	private int PREV_X, PREV_Y;								//움직이기 이전에 뷰가 위치한 점
 	private int MAX_X = -1, MAX_Y = -1;					//뷰의 위치 최대 값
@@ -125,6 +126,10 @@ public class AlwaysOnTopService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null && "pe.sbk.HideCircleMenu".equals(intent.getAction())) {
+            removeCircleMenu();
+        }
+
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -296,12 +301,14 @@ public class AlwaysOnTopService extends Service {
 	
 	private void initiateMenuWindow(final LayoutParams params){
 		try{
-			final View circleMenu = inflater.inflate(R.layout.circle_menu, null);
-			
-			circleMenu.setOnClickListener(new View.OnClickListener() {
+			//final View circleMenu = inflater.inflate(R.layout.circle_menu, null);
+
+            mCircleView =  inflater.inflate(R.layout.circle_menu, null);
+
+            mCircleView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					mWindowManager.removeView(circleMenu);
+					mWindowManager.removeView(mCircleView);
 					mWindowManager.addView(mImageView, params);
 				}
 			});
@@ -309,7 +316,7 @@ public class AlwaysOnTopService extends Service {
 			DisplayMetrics matrix = new DisplayMetrics();
 			mWindowManager.getDefaultDisplay().getMetrics(matrix);		//화면 정보를 가져와서
 		
-			pe.sbk.alwaysontop.CircleLayout circleMenuView = (pe.sbk.alwaysontop.CircleLayout) circleMenu.findViewById(R.id.main_circle_layout);
+			pe.sbk.alwaysontop.CircleLayout circleMenuView = (pe.sbk.alwaysontop.CircleLayout) mCircleView.findViewById(R.id.main_circle_layout);
 			
 			WindowManager.LayoutParams cParams = new WindowManager.LayoutParams(matrix.widthPixels, matrix.heightPixels,WindowManager.LayoutParams.TYPE_PHONE,					//항상 최 상위에 있게. status bar 밑에 있음. 터치 이벤트 받을 수 있음.
 					WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE|WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH,		//이 속성을 안주면 터치 & 키 이벤트도 먹게 된다. //포커스를 안줘서 자기 영역 밖터치는 인식 안하고 키이벤트를 사용하지 않게 설정
@@ -339,7 +346,7 @@ public class AlwaysOnTopService extends Service {
 			//cParams.x = cParams.x - (circleMenu.getWidth()/2);
 			//cParams.y = cParams.y + (circleMenu.getHeight()/2);
 			mWindowManager.removeView(mImageView);
-			mWindowManager.addView(circleMenu, cParams);
+			mWindowManager.addView(mCircleView, cParams);
 			
 			
 			/*pe.sbk.alwaysontop.CircleImageView homeBtn = (pe.sbk.alwaysontop.CircleImageView)circleMenuView.findViewById(R.id.q_home_image);
@@ -357,6 +364,13 @@ public class AlwaysOnTopService extends Service {
 			e.printStackTrace();
 		}
 	}
+
+
+    private void removeCircleMenu() {
+        mWindowManager.removeView(mCircleView);
+        mWindowManager.addView(mImageView, mParams);
+    }
+
 	/**
 	 * 가로 / 세로 모드 변경 시 최대값 다시 설정해 주어야 함.
 	 */
